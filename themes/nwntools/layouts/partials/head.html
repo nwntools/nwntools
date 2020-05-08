@@ -1,0 +1,10 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Site.Title }}</title>
+  {{ $style := resources.Get "sass/main.sass" | resources.ToCSS | resources.Minify | resources.Fingerprint }}
+  <link rel="stylesheet" href="{{ $style.Permalink }}">
+  <script defer src="/js/all.js"></script>
+  {{ $uijs := resources.Get "js/ui.js" | resources.Minify | resources.Fingerprint }}
+  <script defer src="{{ $uijs.Permalink }}"></script>
+</head>
