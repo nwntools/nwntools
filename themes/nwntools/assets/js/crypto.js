@@ -10,6 +10,34 @@ function alphabet_to_dict(alphabet) {
   return dict;
 }
 
+function vigenere_encipher(message, phrase, alphabet) {
+  var char_pos_map = alphabet_to_dict(alphabet);
+  var cipher = "";
+  var shift;
+
+  for (i = 0; i < message.length; i++) {
+    pos = char_pos_map[message[i]];
+    shift = char_pos_map[phrase[mod(i, phrase.length)]]; //only change from otp
+    cipher += alphabet[mod(pos + shift, alphabet.length)];
+  }
+
+  return cipher;
+}
+
+function vigenere_decipher(cipher, phrase, alphabet) {
+  var char_pos_map = alphabet_to_dict(alphabet);
+  var message = "";
+  var shift;
+
+  for (i = 0; i < cipher.length; i++) {
+    pos = char_pos_map[cipher[i]];
+    shift = char_pos_map[phrase[mod(i, phrase.length)]]; //only change from otp
+    message += alphabet[mod(pos - shift, alphabet.length)];
+  }
+
+  return message;
+}
+
 function otp_encipher(message, otp, alphabet, otp_offset) {
 
   var char_pos_map = alphabet_to_dict(alphabet);
