@@ -7,4 +7,6 @@
   <script defer src="/js/all.js"></script>
   {{ $uijs := resources.Get "js/ui.js" | resources.Minify | resources.Fingerprint }}
   <script defer src="{{ $uijs.Permalink }}"></script>
+  {{ $crypto := resources.Get "js/crypto.js" | resources.Minify | resources.Fingerprint }}
+  <script defer src="{{ $crypto.Permalink }}"></script>
 </head>
