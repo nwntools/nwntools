@@ -67,3 +67,54 @@ function otp_decipher(cipher, otp, alphabet, otp_offset) {
 
   return message;
 }
+
+
+function to_ig_writable(s) {
+  output = "@write title Cryptic Writings\n\n@write ";
+  maxmsglen = 227;
+  for (var i = 0; i < s.length; i = i + maxmsglen) {
+    output += s.substring(i, i + maxmsglen - 1) + "\n\n";
+    if (i + maxmsglen < s.length) {
+      output += "@write add ";
+    }
+  }
+  return output;
+}
+
+function encrypt() {
+
+  // Inputs
+  var message = document.getElementById("message").value;
+  var phrase = document.getElementById("phrase").value;
+  var otp = document.getElementById("otp").value;
+  var otp_offset = document.getElementById("otp-offset").value;
+  var alphabet = document.getElementById("alphabet").value;
+
+  // Output fields
+  var output = document.getElementById("output");
+  var ig_writable = document.getElementById("ig-writable");
+
+  var vigenere_cipher = vigenere_encipher(message, phrase, alphabet);
+  var otp_cipher = otp_encipher(vigenere_cipher, otp, alphabet, Number(otp_offset));
+  output.value = otp_cipher;
+  ig_writable.value = to_ig_writable(otp_cipher);
+}
+
+function decrypt() {
+
+  // Inputs
+  var cipher = document.getElementById("message").value;
+  var phrase = document.getElementById("phrase").value;
+  var otp = document.getElementById("otp").value;
+  var otp_offset = document.getElementById("otp-offset").value;
+  var alphabet = document.getElementById("alphabet").value;
+
+  // Output fields
+  var output = document.getElementById("output");
+  var ig_writable = document.getElementById("ig-writable");
+
+  var vigenere_cipher = otp_decipher(cipher, otp, alphabet, Number(otp_offset));
+  var message = vigenere_decipher(vigenere_cipher, phrase, alphabet);
+  output.value = message;
+  ig_writable.value = to_ig_writable(message);
+}

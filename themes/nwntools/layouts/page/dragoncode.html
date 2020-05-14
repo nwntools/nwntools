@@ -13,25 +13,25 @@
             <div class="field">
               <label class="label">Key Phrase</label>
               <div class="control">
-                <input class="input" type="text" placeholder="Key Phrase"></textarea>
+                <input id="phrase" class="input" type="text" placeholder="Key Phrase"></textarea>
               </div>
             </div>
             <div class="field">
               <label class="label">One Time Pad</label>
               <div class="control">
-                <textarea class="textarea" placeholder="One Time Pad"></textarea>
+                <textarea id="otp" class="textarea" placeholder="One Time Pad"></textarea>
               </div>
             </div>
             <div class="field">
               <label class="label">One Time Pad Offset</label>
               <div class="control">
-                <input class="input" type="text" placeholder="Alphabet" value="0"></textarea>
+                <input id="otp-offset" class="input" type="text" placeholder="Alphabet" value="0"></textarea>
               </div>
             </div>
             <div class="field">
               <label class="label">Alphabet</label>
               <div class="control">
-                <input class="input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.-"></textarea>
+                <input id="alphabet" class="input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.-"></textarea>
               </div>
             </div>
           </div>
@@ -39,13 +39,27 @@
             <div class="field">
               <label class="label">Message</label>
               <div class="control">
-                <textarea class="textarea" placeholder="Message"></textarea>
+                <textarea id="message" class="textarea" placeholder="Message"></textarea>
               </div>
             </div>
             <div class="field">
               <label class="label">Output</label>
               <div class="control">
-                <textarea class="textarea" placeholder="Output" readonly></textarea>
+                <textarea id="output" class="textarea" placeholder="Output" readonly></textarea>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">To Write In Game</label>
+              <div class="control">
+                <textarea id="ig-writable" class="textarea" placeholder="Output" readonly></textarea>
+              </div>
+            </div>
+            <div class="field is-grouped">
+              <div class="control">
+                <button class="button is-link" onclick="encrypt()">Encrypt</button>
+              </div>
+              <div class="control">
+                <button class="button is-link" onclick="decrypt()">Decrypt</button>
               </div>
             </div>
           </div>
