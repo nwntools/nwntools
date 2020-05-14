@@ -69,7 +69,7 @@ function otp_decipher(cipher, otp, alphabet, otp_offset) {
 }
 
 
-function to_ig_writable(s) {
+function to_ig_writable(s, preamble) {
   output = "@write title Cryptic Writings\n\n@write ";
   maxmsglen = 227;
   for (var i = 0; i < s.length; i = i + maxmsglen) {
@@ -97,7 +97,8 @@ function encrypt() {
   var vigenere_cipher = vigenere_encipher(message, phrase, alphabet);
   var otp_cipher = otp_encipher(vigenere_cipher, otp, alphabet, Number(otp_offset));
   output.value = otp_cipher;
-  ig_writable.value = to_ig_writable(otp_cipher);
+  preamble = "[There are strange runes written here, each represented by a character]||";
+  ig_writable.value = to_ig_writable(preamble + otp_cipher);
 }
 
 function decrypt() {
