@@ -8,59 +8,66 @@
         <h2 class="subtitle">
           A helper to read and write secret coded messages IG.
         </h2>
-        <div class="columns">
-          <div class="column">
-            <div class="field">
-              <label class="label">Key Phrase</label>
-              <div class="control">
-                <input id="phrase" class="input" type="text" placeholder="Key Phrase"></textarea>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">One Time Pad</label>
-              <div class="control">
-                <textarea id="otp" class="textarea" placeholder="One Time Pad"></textarea>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">One Time Pad Offset</label>
-              <div class="control">
-                <input id="otp-offset" class="input" type="text" placeholder="Alphabet" value="0"></textarea>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Alphabet</label>
-              <div class="control">
-                <input id="alphabet" class="input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.-?'"></textarea>
-              </div>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div id="error-messages" class="notification is-danger is-light is-hidden">
+        <button class="delete"></button>
+      </div>
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">Key Phrase</label>
+            <div class="control">
+              <input id="phrase" class="input" type="text" placeholder="Key Phrase"></textarea>
             </div>
           </div>
-          <div class="column">
-            <div class="field">
-              <label class="label">Message</label>
-              <div class="control">
-                <textarea id="message" class="textarea" placeholder="Message"></textarea>
-              </div>
+          <div class="field">
+            <label class="label">One Time Pad</label>
+            <div class="control">
+              <textarea id="otp" class="textarea" placeholder="One Time Pad"></textarea>
             </div>
-            <div class="field">
-              <label class="label">Output</label>
-              <div class="control">
-                <textarea id="output" class="textarea" placeholder="Output" readonly></textarea>
-              </div>
+          </div>
+          <div class="field">
+            <label class="label">One Time Pad Offset</label>
+            <div class="control">
+              <input id="otp-offset" class="input" type="text" placeholder="Alphabet" value="0"></textarea>
             </div>
-            <div class="field">
-              <label class="label">To Write In Game</label>
-              <div class="control">
-                <textarea id="ig-writable" class="textarea" placeholder="Output" readonly></textarea>
-              </div>
+          </div>
+          <div class="field">
+            <label class="label">Alphabet</label>
+            <div class="control">
+              <input id="alphabet" class="input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.-?'"></textarea>
             </div>
-            <div class="field is-grouped">
-              <div class="control">
-                <button class="button is-link" onclick="encrypt()">Encrypt</button>
-              </div>
-              <div class="control">
-                <button class="button is-link" onclick="decrypt()">Decrypt</button>
-              </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label">Message</label>
+            <div class="control">
+              <textarea id="message" class="textarea" placeholder="Message"></textarea>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Output</label>
+            <div class="control">
+              <textarea id="output" class="textarea" placeholder="Output" readonly></textarea>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">To Write In Game</label>
+            <div class="control">
+              <textarea id="ig-writable" class="textarea" placeholder="Output" readonly></textarea>
+            </div>
+          </div>
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-link" onclick="encrypt()">Encrypt</button>
+            </div>
+            <div class="control">
+              <button class="button is-link" onclick="decrypt()">Decrypt</button>
             </div>
           </div>
         </div>

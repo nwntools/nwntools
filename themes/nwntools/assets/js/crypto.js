@@ -73,8 +73,8 @@ function otp_decipher(cipher, otp, alphabet, otp_offset) {
 }
 
 
-function to_ig_writable(s, preamble) {
-  output = "@write title Cryptic Writings\n\n@write ";
+function to_ig_writable(s, title) {
+  output = "@write title " + title + "\n\n@write ";
   maxmsglen = 227;
   for (var i = 0; i < s.length; i = i + maxmsglen) {
     output += s.substring(i, i + maxmsglen - 1) + "\n\n";
@@ -89,56 +89,50 @@ function insertAfter(newNode, referenceNode) {
   referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
+var error_messages = [];
+
 function in_alphabet(alphabet, phrase, otp, message) {
   var char_pos_map = alphabet_to_dict(alphabet.value);
-  msg = "";
   invalid_chars = "";
-  in_a = true;
   to_check = [
     ["Phrase", phrase],
     ["One Time Pad", otp],
     ["Message", message]
   ];
   for (var i = 0; i < to_check.length; i++) {
-    labelled_field = to_check[i];
+    var labelled_field = to_check[i];
     str = labelled_field[1].value;
-    if (old_err = document.getElementById(labelled_field[1].id + "-error")) {
-      old_err.remove();
-    }
-    labelled_field[1].classList.remove("is-danger");
     for (var j = 0; j < str.length; j++) {
       if (!char_pos_map.hasOwnProperty(str[j])) {
-        if (invalid_chars.length > 0) {
-          invalid_chars += ", ";
+        if (str[j] == " ") {
+          new_char = "<space>";
         }
-        invalid_chars += str[j];
+        else {
+          new_char = str[j];
+        }
+        if (invalid_chars.indexOf(new_char) == -1) {
+          invalid_chars += new_char + " ";
+        }
       }
     }
     if (invalid_chars.length > 0) {
-      in_a = false;
-      labelled_field[1].classList.add("is-danger");
-      err = document.createElement("p");
-      err.id = labelled_field[1].id + "-error";
-      err.classList.value = "help is-danger";
-      err.innerText = "Characters not in alphabet: " + invalid_chars;
-      insertAfter(err, labelled_field[1].parentNode);
+      error_messages.push(labelled_field[0] + " characters not in alphabet: " + invalid_chars);
       invalid_chars = "";
     }
   }
-  return in_a;
 }
 
 function in_bounds(otp, message, otp_offset) {
   offset = Number(otp_offset.value);
-  if (!otp.value[offset]) {
-    // Offset too long msg
-    return false;
+  if (isNaN(offset)) {
+    error_messages.push("The offset must be a number");
+  }
+  else if (!otp.value[offset]) {
+    error_messages.push("The chosen offset is too high or low for the One Time Pad");
   }
   else if (otp.value.length - offset < message.value.length) {
-    // Message is too long for the OTP key from offset.
-    return false;
+    error_messages.push("There is only space for " + (otp.value.length - offset) + " characters in the message");
   }
-  return true;
 }
 
 function input_valid() {
@@ -148,18 +142,47 @@ function input_valid() {
   var otp_offset = document.getElementById("otp-offset");
   var alphabet = document.getElementById("alphabet");
 
-  if (!in_alphabet(alphabet, phrase, otp, message)) {
+  // Check
+  in_alphabet(alphabet, phrase, otp, message);
+  in_bounds(otp, message, otp_offset);
+
+  // error messages to DOM
+  if (error_messages.length > 0) {
+    var errors_box = document.getElementById("error-messages");
+    var error_node;
+    for (var i = 0; i < error_messages.length; i++) {
+      error_node = document.createElement("p");
+      error_node.innerText = error_messages[i];
+      errors_box.appendChild(error_node);
+    }
+    errors_box.classList.remove("is-hidden");
     return false;
   }
-  else if (!in_bounds(otp, message, otp_offset)) {
-    return false;
+  else {
+    return true;
   }
-  return true;
+}
+
+function clean_errors() {
+  while (error_messages.length > 0) {
+    error_messages.pop();
+  }
+  var errors_box = document.getElementById("error-messages");
+  errors_box.classList.add("is-hidden");
+  var children = errors_box.children;
+  var child_collection = [];
+  for (var i = 1; i < children.length; i++) {
+    child_collection.push(children[i]);
+  }
+  for (var i = 0; i < child_collection.length; i++) {
+    child_collection[i].remove();
+  }
 }
 
 function encrypt() {
 
   // Input validation
+  clean_errors();
   if (!input_valid()) {
     return;
   }
@@ -180,10 +203,16 @@ function encrypt() {
   var otp_cipher = otp_encipher(vigenere_cipher, otp, alphabet, Number(otp_offset));
   output.value = otp_cipher;
   preamble = "[There are strange runes written here, each represented by a character]||";
-  ig_writable.value = to_ig_writable(preamble + otp_cipher);
+  ig_writable.value = to_ig_writable(preamble + otp_cipher, "Cryptic Writings");
 }
 
 function decrypt() {
+
+  // Input validation
+  clean_errors();
+  if (!input_valid()) {
+    return;
+  }
 
   // Inputs
   var cipher = document.getElementById("message").value;
@@ -199,5 +228,5 @@ function decrypt() {
   var vigenere_cipher = otp_decipher(cipher, otp, alphabet, Number(otp_offset));
   var message = vigenere_decipher(vigenere_cipher, phrase, alphabet);
   output.value = message;
-  ig_writable.value = to_ig_writable(message);
+  ig_writable.value = to_ig_writable(message, "Writings");
 }
