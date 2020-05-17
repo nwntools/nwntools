@@ -4,6 +4,7 @@
   <title>{{ .Site.Title }}</title>
   {{ $style := resources.Get "sass/main.sass" | resources.ToCSS | resources.Minify | resources.Fingerprint }}
   <link rel="stylesheet" href="{{ $style.Permalink }}">
+  <script defer src="/js/all.js"></script>
   {{ $uijs := resources.Get "js/ui.js" }}
   {{ $crypto := resources.Get "js/crypto.js" }}
   {{ $scripts := slice $uijs $crypto | resources.Concat "js/bundle.js" | resources.Minify | resources.Fingerprint }}
