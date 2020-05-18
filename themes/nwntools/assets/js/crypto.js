@@ -74,11 +74,13 @@ function otp_decipher(cipher, otp, alphabet, otp_offset) {
 
 
 function to_ig_writable(s, title) {
+  var str = s.trim();
+  str = str.replace(/\n/g, "|");
   output = "@write title " + title + "\n\n@write ";
   maxmsglen = 227;
-  for (var i = 0; i < s.length; i = i + maxmsglen) {
-    output += s.substring(i, i + maxmsglen - 1) + "\n\n";
-    if (i + maxmsglen < s.length) {
+  for (var i = 0; i < str.length; i = i + maxmsglen) {
+    output += str.substring(i, i + maxmsglen - 1) + "\n\n";
+    if (i + maxmsglen < str.length) {
       output += "@write add ";
     }
   }
@@ -92,7 +94,7 @@ function insertAfter(newNode, referenceNode) {
 var error_messages = [];
 
 function in_alphabet(alphabet, phrase, otp, message) {
-  var char_pos_map = alphabet_to_dict(alphabet.value);
+  var char_pos_map = alphabet_to_dict(alphabet);
   invalid_chars = "";
   to_check = [
     ["Phrase", phrase],
@@ -101,11 +103,14 @@ function in_alphabet(alphabet, phrase, otp, message) {
   ];
   for (var i = 0; i < to_check.length; i++) {
     var labelled_field = to_check[i];
-    str = labelled_field[1].value;
+    var str = labelled_field[1];
     for (var j = 0; j < str.length; j++) {
       if (!char_pos_map.hasOwnProperty(str[j])) {
-        if (str[j] == " ") {
-          new_char = "<space>";
+        if (str[j] == "$") {
+          new_char = "$(newline)";
+        }
+        else if (str[j] == "_") {
+          new_char = "_(space)";
         }
         else {
           new_char = str[j];
@@ -123,26 +128,21 @@ function in_alphabet(alphabet, phrase, otp, message) {
 }
 
 function in_bounds(otp, message, otp_offset) {
-  offset = Number(otp_offset.value);
+  var offset = Number(otp_offset);
   if (isNaN(offset)) {
     error_messages.push("The offset must be a number");
   }
-  else if (!otp.value[offset]) {
+  else if (!otp[offset]) {
     error_messages.push("The chosen offset is too high or low for the One Time Pad");
   }
-  else if (otp.value.length - offset < message.value.length) {
-    error_messages.push("There is only space for " + (otp.value.length - offset) + " characters in the message");
+  else if (otp.length - offset < message.length) {
+    error_messages.push("There is only space for " + (otp.length - offset) + " characters in the message");
   }
 }
 
-function input_valid() {
-  var message = document.getElementById("message");
-  var phrase = document.getElementById("phrase");
-  var otp = document.getElementById("otp");
-  var otp_offset = document.getElementById("otp-offset");
-  var alphabet = document.getElementById("alphabet");
+function input_valid(message, phrase, otp, otp_offset, alphabet) {
 
-  // Check
+  // Checks
   in_alphabet(alphabet, phrase, otp, message);
   in_bounds(otp, message, otp_offset);
 
@@ -179,13 +179,55 @@ function clean_errors() {
   }
 }
 
-function encrypt() {
+// Make string suitable for processing
+function crypto_str(s) {
+  var new_s = (' ' + s).slice(1);
+  new_s = new_s.replace(/ /g, "_");
+  new_s = new_s.replace(/\n/g, "$");
+  return new_s;
+}
 
-  // Input validation
-  clean_errors();
-  if (!input_valid()) {
-    return;
+// Make string suitable for people
+function real_str(s) {
+  var new_s = (' ' + s).slice(1);
+  new_s = new_s.replace(/_/g, " ");
+  new_s = new_s.replace(/\$/g, "\n");
+  console.log(new_s);
+  return new_s;
+}
+
+function make_otp() {
+  var otp_output = document.getElementById("otp-output");
+  var otp_length = document.getElementById("otp-length");
+  var alphabet = document.getElementById("alphabet").value;
+
+  // Fill the numeric_key with random alphabet indexes
+  samples = new Uint8Array(Number(otp_length.value));
+  numeric_key = new Uint8Array(Number(otp_length.value));
+  var pos = 0;
+  filling:
+  while (true) {
+    window.crypto.getRandomValues(samples);
+    for (var i = 0; i < samples.length; i++) {
+      if (samples[i] >= 0 && samples[i] < alphabet.length) {
+        numeric_key[pos++] = samples[i];
+        if (pos >= numeric_key.length) {
+          break filling;
+        }
+      }
+    }
   }
+
+  // Construct OTP string
+  var otp = "";
+  for (var i = 0; i < numeric_key.length; i++) {
+    otp += alphabet[numeric_key[i]];
+  }
+
+  otp_output.value = otp;
+}
+
+function encrypt() {
 
   // Inputs
   var message = document.getElementById("message").value;
@@ -193,6 +235,16 @@ function encrypt() {
   var otp = document.getElementById("otp").value;
   var otp_offset = document.getElementById("otp-offset").value;
   var alphabet = document.getElementById("alphabet").value;
+
+  // Prepare message and phrase
+  message = crypto_str(message);
+  phrase = crypto_str(phrase);
+
+  // Input validation
+  clean_errors();
+  if (!input_valid(message, phrase, otp, otp_offset, alphabet)) {
+    return;
+  }
 
   // Output fields
   var output = document.getElementById("output");
@@ -208,12 +260,6 @@ function encrypt() {
 
 function decrypt() {
 
-  // Input validation
-  clean_errors();
-  if (!input_valid()) {
-    return;
-  }
-
   // Inputs
   var cipher = document.getElementById("message").value;
   var phrase = document.getElementById("phrase").value;
@@ -221,12 +267,21 @@ function decrypt() {
   var otp_offset = document.getElementById("otp-offset").value;
   var alphabet = document.getElementById("alphabet").value;
 
+  // Prepare phrase
+  phrase = crypto_str(phrase);
+
+  // Input validation
+  clean_errors();
+  if (!input_valid(cipher, phrase, otp, otp_offset, alphabet)) {
+    return;
+  }
+
   // Output fields
   var output = document.getElementById("output");
   var ig_writable = document.getElementById("ig-writable");
 
   var vigenere_cipher = otp_decipher(cipher, otp, alphabet, Number(otp_offset));
   var message = vigenere_decipher(vigenere_cipher, phrase, alphabet);
-  output.value = message;
-  ig_writable.value = to_ig_writable(message, "Writings");
+  output.value = real_str(message);
+  ig_writable.value = to_ig_writable(output.value, "Writings");
 }

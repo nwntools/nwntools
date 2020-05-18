@@ -32,7 +32,7 @@
               </div>
             </div>
             <div class="field">
-              <label class="label rl-text-color">One Time Pad</label>
+              <label class="label rl-text-color">One Time Key</label>
               <div class="control">
                 <textarea id="otp" class="textarea rl-input" placeholder="One Time Pad"></textarea>
               </div>
@@ -46,7 +46,7 @@
             <div class="field">
               <label class="label rl-text-color">Alphabet</label>
               <div class="control">
-                <input id="alphabet" class="input rl-input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.-?'"></textarea>
+                <input id="alphabet" class="input rl-input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-?'_$"></textarea>
               </div>
             </div>
           </div>
@@ -80,6 +80,38 @@
                     <i class="fas fa-lock-open"></i>
                   </span>
                   <span>Decrypt</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section rl-backdrop">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-half">
+          <div class="box rl-background">
+            <div class="field">
+              <label class="label rl-text-color">One Time Key</label>
+              <div class="control">
+                <textarea id="otp-output" class="textarea rl-input" placeholder="Output" rows="12" readonly></textarea>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label rl-text-color">Key Length</label>
+              <div class="control">
+                <input id="otp-length" class="input rl-input" placeholder="200" value="200"></textarea>
+              </div>
+            </div>
+            <div class="field">
+              <div class="control">
+                <button class="button" onclick="make_otp()">
+                  <span class="icon">
+                    <i class="fas fa-dice"></i>
+                  </span>
+                  <span>Make Key</span>
                 </button>
               </div>
             </div>
