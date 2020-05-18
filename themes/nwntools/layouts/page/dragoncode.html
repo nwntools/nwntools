@@ -11,6 +11,13 @@
       </div>
     </div>
   </section>
+  <section class="section rl-backdrop has-text-centered">
+    <div class="container">
+      <h1 class="title rl-text-color">
+        Encrypt or Decrypt Messages
+      </h1>
+    </div>
+  </section>
   <section class="section rl-backdrop">
     <div class="container">
       <div id="error-messages" class="notification is-danger is-light is-hidden">
@@ -38,7 +45,7 @@
               </div>
             </div>
             <div class="field">
-              <label class="label rl-text-color">One Time Pad Offset</label>
+              <label class="label rl-text-color">One Time Key Offset</label>
               <div class="control">
                 <input id="otp-offset" class="input rl-input" type="text" placeholder="Alphabet" value="0"></textarea>
               </div>
@@ -60,7 +67,7 @@
               </div>
             </div>
             <div class="field">
-              <label class="label rl-text-color">To Write In Game</label>
+              <label class="label rl-text-color">Commands for writing in game</label>
               <div class="control">
                 <textarea id="ig-writable" class="textarea rl-input" placeholder="Output" rows="12" readonly></textarea>
               </div>
@@ -88,21 +95,38 @@
       </div>
     </div>
   </section>
+  <section class="section rl-backdrop has-text-centered">
+    <div class="container">
+      <h1 class="title rl-text-color">
+        Make a new One Time Key
+      </h1>
+    </div>
+  </section>
   <section class="section rl-backdrop">
     <div class="container">
-      <div class="columns is-centered">
-        <div class="column is-half">
+      <div class="columns">
+        <div class="column">
+          <div class="box rl-background">
+            <div class="field">
+              <label class="label rl-text-color">Key Length</label>
+              <div class="control">
+                <input id="otp-length" class="input rl-input" placeholder="948" value="948"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column">
           <div class="box rl-background">
             <div class="field">
               <label class="label rl-text-color">One Time Key</label>
               <div class="control">
-                <textarea id="otp-output" class="textarea rl-input" placeholder="Output" rows="12" readonly></textarea>
+                <textarea id="otp-output" class="textarea rl-input" placeholder="Output" readonly></textarea>
               </div>
             </div>
             <div class="field">
-              <label class="label rl-text-color">Key Length</label>
+              <label class="label rl-text-color">Commands for writing in game</label>
               <div class="control">
-                <input id="otp-length" class="input rl-input" placeholder="200" value="200"></textarea>
+                <textarea id="ig-writable-otp" class="textarea rl-input" placeholder="Output" rows="12" readonly></textarea>
               </div>
             </div>
             <div class="field">

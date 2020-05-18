@@ -1,3 +1,5 @@
+var crypto_description = "[Each symbol here is represented by a rune from the Drithik alphabet]||";
+
 function mod(a, n) {
   return ((a % n) + n) % n;
 }
@@ -76,19 +78,15 @@ function otp_decipher(cipher, otp, alphabet, otp_offset) {
 function to_ig_writable(s, title) {
   var str = s.trim();
   str = str.replace(/\n/g, "|");
-  output = "@write title " + title + "\n\n@write ";
-  maxmsglen = 227;
+  var output = "@write title " + title + "\n\n@write ";
+  var maxmsglen = 180;
   for (var i = 0; i < str.length; i = i + maxmsglen) {
-    output += str.substring(i, i + maxmsglen - 1) + "\n\n";
+    output += str.substring(i, i + maxmsglen) + "\n\n";
     if (i + maxmsglen < str.length) {
       output += "@write add ";
     }
   }
   return output;
-}
-
-function insertAfter(newNode, referenceNode) {
-  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
 
 var error_messages = [];
@@ -196,20 +194,18 @@ function real_str(s) {
   return new_s;
 }
 
-function make_otp() {
-  var otp_output = document.getElementById("otp-output");
-  var otp_length = document.getElementById("otp-length");
-  var alphabet = document.getElementById("alphabet").value;
+// Creates random array of length ints with values of min - ceiling -1
+function random_ints(length, min, ceiling) {
 
   // Fill the numeric_key with random alphabet indexes
-  samples = new Uint8Array(Number(otp_length.value));
-  numeric_key = new Uint8Array(Number(otp_length.value));
+  samples = new Uint8Array(Number(length));
+  numeric_key = new Uint8Array(Number(length));
   var pos = 0;
   filling:
   while (true) {
     window.crypto.getRandomValues(samples);
     for (var i = 0; i < samples.length; i++) {
-      if (samples[i] >= 0 && samples[i] < alphabet.length) {
+      if (samples[i] >= min && samples[i] < ceiling) {
         numeric_key[pos++] = samples[i];
         if (pos >= numeric_key.length) {
           break filling;
@@ -217,14 +213,60 @@ function make_otp() {
       }
     }
   }
+  return numeric_key;
+}
 
-  // Construct OTP string
+function numeric_key_to_str(numeric_key, alphabet) {
   var otp = "";
   for (var i = 0; i < numeric_key.length; i++) {
     otp += alphabet[numeric_key[i]];
   }
+  return otp;
+}
+
+// Creates random string of length from alphabet
+function random_str(length, alphabet) {
+  var numeric_key = random_ints(length, 0, alphabet.length);
+  var otp = numeric_key_to_str(numeric_key, alphabet);
+  return otp;
+}
+
+function make_otp() {
+  var otp_output = document.getElementById("otp-output");
+  var ig_writable_otp = document.getElementById("ig-writable-otp");
+  var otp_length = document.getElementById("otp-length").value;
+  var alphabet = document.getElementById("alphabet").value;
+
+  var otp = random_str(Number(otp_length), alphabet);
+  var key_id = random_str(3, alphabet.substring(0, Math.min(52, alphabet.length))); // a-zA-Z normally...or alphabet length
+
+  // Create key ID and beginning and end of message in OTP
+  otp = "@" + key_id + "@" + otp;
 
   otp_output.value = otp;
+
+  // 1024 characters fit on paper, key_id = 5, crypto_desc = 71, 1024 - 76 = 948
+  ig_writable_otp.value = to_ig_writable(crypto_description + otp, "Cryptic Writings");
+}
+
+function get_crypto_meta(s) {
+  var m = s.match(/^@(.*)@/);
+  if (m) {
+    m = m[1];
+    meta = { "label": m.match(/^.../)[0] };
+    offset = m.match(/^...([0-9]+)-/);
+    ceiling = m.match(/,([0-9]+)$/);
+    if (offset && offset.length > 1) meta["offset"] = Number(offset[1]);
+    if (ceiling && ceiling.length > 1) meta["ceiling"] = Number(ceiling[1]);
+    return meta;
+  }
+  else {
+    return null;
+  }
+}
+
+function remove_crypto_meta(s) {
+  return s.replace(/^@.*@/, "");
 }
 
 function encrypt() {
@@ -236,9 +278,11 @@ function encrypt() {
   var otp_offset = document.getElementById("otp-offset").value;
   var alphabet = document.getElementById("alphabet").value;
 
-  // Prepare message and phrase
+  // Prepare message, phrase and otp
   message = crypto_str(message);
   phrase = crypto_str(phrase);
+  var otp_meta = get_crypto_meta(otp);
+  otp = remove_crypto_meta(otp);
 
   // Input validation
   clean_errors();
@@ -253,9 +297,10 @@ function encrypt() {
   // Encrypt
   var vigenere_cipher = vigenere_encipher(message, phrase, alphabet);
   var otp_cipher = otp_encipher(vigenere_cipher, otp, alphabet, Number(otp_offset));
+  var cipher_meta = "@" + otp_meta["label"] + otp_offset + "-" + (Number(otp_offset) + otp_cipher.length) + "@";
+  otp_cipher = cipher_meta + otp_cipher;
   output.value = otp_cipher;
-  preamble = "[There are strange runes written here, each represented by a character]||";
-  ig_writable.value = to_ig_writable(preamble + otp_cipher, "Cryptic Writings");
+  ig_writable.value = to_ig_writable(crypto_description + otp_cipher, "Cryptic Writings");
 }
 
 function decrypt() {
@@ -267,8 +312,12 @@ function decrypt() {
   var otp_offset = document.getElementById("otp-offset").value;
   var alphabet = document.getElementById("alphabet").value;
 
-  // Prepare phrase
+  // Prepare inputs
   phrase = crypto_str(phrase);
+  // TODO: if meta on cipher, match id with otp for input validation
+  // TODO: if meta on cipher, use offset there instead of usual offset
+  var cipher_meta = get_crypto_meta(otp);
+  otp = remove_crypto_meta(otp);
 
   // Input validation
   clean_errors();
