@@ -5,6 +5,7 @@
 @import "bulma/form/_all.sass"
 @import "bulma/grid/_all.sass"
 @import "bulma/layout/_all.sass"
+@import "bulma-tooltip"
 //@import "webkit.css"
 
 .rl-backdrop
@@ -14,8 +15,8 @@
 .rl-background
   background-color: #551313
 
-.rl-text-color
-  color: #dfdfdf
+.rl-text-color, .rl-text-color > *
+  color: #dfdfdf !important
 
 .rl-input
   background-color: black
@@ -30,3 +31,6 @@
   color: #f23535
   &:hover
     background-color: #6e1818
+
+.banner
+  background-image: url("/img/dragoncode.jpg")

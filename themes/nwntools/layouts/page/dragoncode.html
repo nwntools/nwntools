@@ -1,16 +1,59 @@
 {{ define "main" }}
-  <section class="hero is-black">
-    <div class="hero-body has-text-centered">
-      <div class="container">
-        <h1 class="title">
-          Dragon Code
-        </h1>
-        <h2 class="subtitle">
-          A helper to read and write secret coded messages IG.
-        </h2>
+  <section class="section rl-backdrop">
+    <div class="container">
+      <div class="columns">
+        <div class="column">
+          <div class="box rl-background is-dark">
+            <div class="content rl-text-color">
+              <h1 class="title has-text-centered">The Dragon Code</h1>
+              <center><img class="is-centered" src="/img/dragoncode.jpg"></img></center>
+              <br>
+              <p>This secret code system has slowly started circulating in the Lands of Mists among groups that see its value for keeping themselves and theirs safe, covering nefarious activities or sharing secrets that threaten those in power. If used correctly, its promise is to make it impossible to decipher one's communications without infiltrating or influencing the people involved.</p>
+              <p>While the code is easy to teach to those of average intelligence, it can be boring OOCly to do by hand. Let this tool do all the heavy lifting instead.</p>
+              <h4>Encrypting</h4>
+              <p>Put the message, key phrase and one time key into the appropriate fields. If it's not the first message used for this one time key, also input the last coded message, its "@...@" label or simply where it should start being coded in the one time key. Then click "Encrypt".</p>
+              <h4>Decrypting</h4>
+              <p>Put the coded message, key phrase and one time key into the appropriate fields. Then click "Decrypt".</p>
+            </div>
+            <div class="field">
+              <label class="label rl-text-color">
+                <span>Rune Representation</span>
+                <span class="has-tooltip-multiline" data-tooltip="A name for the type of runes used to represent each symbol in the alphabet. It is used in the coded message description in the command window. Everyone communicating must agree on this.">
+                  <i class="fas fa-question-circle"></i>
+                </span>
+              </label>
+              <div class="control">
+                <input id="runes" class="input rl-input" type="text" placeholder="Alphabet" value="Drithik"></input>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label rl-text-color">
+                <span>Alphabet</span>
+                <span class="has-tooltip-multiline" data-tooltip="You can change the alphabet, but for most cases, it's fine as is. Everyone communicating must agree on the same alphabet.">
+                  <i class="fas fa-question-circle"></i>
+                </span>
+              </label>
+              <div class="control">
+                <input id="alphabet" class="input rl-input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-?'_$"></input>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box rl-background is-dark">
+            <div class="content rl-text-color">
+              <h3>How it works IC</h3>
+              <p>A given group that wants to exchange secret messages decides on an alphabet of symbols to write in. Usually the alphabet given below is enough, but some groups may have special preferences. Each symbol corresponds to a number, according to its position, from 0, 1, 2 and up. The "_" and "$" symbols are special and represent whitespace and linebreak respectively.</p>
+              <p>A fairly hard to guess Key Phrase is chosen and memorized by everyone, for example: "Teddlar fingoth cakemaker". Then a new One Time Key is made. This key consists of a sequence of randomly picked symbols from the alphabet. Each symbol can be picked by throwing dice. For example, if the alphabet numbers are 0 - 60, then 8d6 can be thrown and the result subtracted by 8. If the result is over 60, then we throw again, otherwise we write the symbol corresponding to the number.</p>
+              <p>For the first Message we want to code, the Key Phrase is lined up with the start of the Message. The number representation of each adjacent symbol is added together, and the symbol representation of the resulting number becomes a part of the Key Phrase Coded Message. If the number result goes beyond the alphabet, we count the rest from the start of the alphabet as if the alphabet were arranged in a circle. The Key Phrase is used again and again until all the Message symbols are coded. Next we line the whole One Time Key up with the Key Phrase Coded Message and get the final Coded Message in the same way, except the One Time Key is used only once. It must therefore be as long or longer than the message. To decipher the Coded Message to get the Message, the process is simply reversed.</p>
+              <p>The same portion of the One Time Key must not be used for more than one Message, because anyone with their hands on two Coded Messages made with the same One Time Key has a tiny chance to figure out the One Time Key. For this reason, all subsequent Messages made with a distinct One Time Key must use the portion of the One Time Key starting from the end of its used portion, i.e. where the last Message ended. At some point, the One Time Key will be just about used up, so the group must come together again to share a new One Time Key. The arrangement of that meeting can be announced with the little that is left of the One Time Key.</p>
+              <p>To more easily track which portion of which One Time Key should be used, each One Time Key is given a three letter, random looking label at the start of it, e.g. "@ArQ@". Each Message is also labelled e.g. "@ArQ24-60", where 24 is where the Message start in the One Time Key "ArQ" and where 60 is where the next Message should start.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
   <section class="section rl-backdrop has-text-centered">
     <div class="container">
       <h1 class="title rl-text-color">
@@ -27,7 +70,7 @@
         <div class="column">
           <div class="box rl-background">
             <div class="field">
-              <label class="label rl-text-color">Message</label>
+              <label class="label rl-text-color">Message / Coded Message</label>
               <div class="control">
                 <textarea id="message" class="textarea rl-input" placeholder="Message"></textarea>
               </div>
@@ -45,15 +88,14 @@
               </div>
             </div>
             <div class="field">
-              <label class="label rl-text-color">One Time Key Offset</label>
+              <label class="label rl-text-color">
+                <span>Last Coded Message</span>
+                <span class="has-tooltip-multiline" data-tooltip="Only needed for encrypting. You can input the whole of the last coded message, its @...@ preamble or simply the number index of where in the OTK it should start encrypting.">
+                  <i class="fas fa-question-circle"></i>
+                </span>
+              </label>
               <div class="control">
-                <input id="otp-offset" class="input rl-input" type="text" placeholder="Alphabet" value="0"></textarea>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label rl-text-color">Alphabet</label>
-              <div class="control">
-                <input id="alphabet" class="input rl-input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-?'_$"></textarea>
+                <textarea id="last-code" class="textarea rl-input" type="text" placeholder="0">0</textarea>
               </div>
             </div>
           </div>
@@ -61,7 +103,7 @@
         <div class="column">
           <div class="box rl-background">
             <div class="field">
-              <label class="label rl-text-color">Output</label>
+              <label class="label rl-text-color">Result</label>
               <div class="control">
                 <textarea id="output" class="textarea rl-input" placeholder="Output" readonly></textarea>
               </div>
@@ -108,7 +150,12 @@
         <div class="column">
           <div class="box rl-background">
             <div class="field">
-              <label class="label rl-text-color">Key Length</label>
+              <label class="label rl-text-color">
+                <span>Key Length</span>
+                <span class="icon has-tooltip-multiline" data-tooltip="The default 948 length is enough to fill one parchment along with the added preamble in the command box. Both add up to 1024 which is the max length for a parchment.">
+                  <i class="fas fa-question-circle"></i>
+                </span>
+              </label>
               <div class="control">
                 <input id="otp-length" class="input rl-input" placeholder="948" value="948"></textarea>
               </div>
