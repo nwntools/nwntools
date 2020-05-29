@@ -43,10 +43,6 @@ function vigenere_decipher(cipher, phrase, alphabet) {
   return message;
 }
 
-// Precon:
-// Postcon:
-// Check that msg and key are in alphabet
-// Check if otp used beyond bound
 function otp_encipher(message, otp, alphabet, otp_offset) {
 
   var char_pos_map = alphabet_to_dict(alphabet);
@@ -142,17 +138,14 @@ function in_bounds(otp, message, otp_offset) {
 }
 
 function metas_good(cipher_meta, otp_meta, cipher_label) {
-  console.log(cipher_meta);
-  console.log(otp_meta);
-  console.log(cipher_label);
   if (!(cipher_meta && otp_meta)) {
-    error_messages.push("Both the " + cipher_label +" and the One Time Key must have @...@ preambles");
+    error_messages.push("Both the " + cipher_label +" and the One Time Key must have ^...^ preambles");
   }
   else if (!otp_meta["label"]) {
-    error_messages.push("The One Time Key doesn't have a well formed preamble \"@<key label>...@\"");
+    error_messages.push("The One Time Key doesn't have a well formed preamble \"^<key label>...^\"");
   }
   else if (!(cipher_meta["label"] && cipher_meta["offset"] && cipher_meta["ceiling"])) {
-    error_messages.push("The " + cipher_label +" doesn't have a well formed preamble \"@<key label><msg start>-<next msg start>@\"");
+    error_messages.push("The " + cipher_label +" doesn't have a well formed preamble \"^<key label><msg start>-<next msg start>^\"");
   }
 }
 
@@ -202,7 +195,6 @@ function real_str(s) {
   var new_s = (' ' + s).slice(1);
   new_s = new_s.replace(/_/g, " ");
   new_s = new_s.replace(/\$/g, "\n");
-  console.log(new_s);
   return new_s;
 }
 
@@ -253,7 +245,7 @@ function make_otp() {
   var key_id = random_str(3, alphabet.substring(0, Math.min(52, alphabet.length))); // a-zA-Z normally...or alphabet length
 
   // Create key ID and beginning and end of message in OTP
-  otp = "@" + key_id + "@" + otp;
+  otp = "^" + key_id + "^" + otp;
 
   otp_output.value = otp;
 
@@ -261,8 +253,48 @@ function make_otp() {
   ig_writable_otp.value = to_ig_writable(crypto_description() + otp, "Cryptic Writings");
 }
 
-function get_crypto_meta(s) {
-  var m = s.match(/^@([a-zA-Z]{3})(([0-9]+)-([0-9]+))?@/);
+// phrase must be long enough here
+function encipher_meta(meta, phrase, alphabet) {
+  if (meta) {
+    var label = meta["label"];
+    var offset = meta["offset"];
+    var ceiling = meta["ceiling"];
+    if (label && offset && ceiling) {
+      meta["offset"] = vigenere_encipher(offset, phrase.substr(0, offset.length), alphabet);
+      meta["ceiling"] = vigenere_encipher(ceiling, phrase.substr(offset.length, ceiling.length), alphabet);
+      var subphrase = phrase.substr(offset.length + ceiling.length);
+      var label_offset = mod(Number(ceiling), subphrase.length);
+      var prefix = alphabet[0].repeat(label_offset);
+      label = vigenere_encipher(prefix + label, subphrase, alphabet);
+      meta["label"] = label.substr(label_offset);
+    }
+  }
+}
+
+// phrase must be long enough here
+function decipher_meta(meta, phrase, alphabet) {
+  if (meta) {
+    var label = meta["label"];
+    var offset = meta["offset"];
+    var ceiling = meta["ceiling"];
+    if (label && offset && ceiling) {
+      meta["offset"] = vigenere_decipher(offset, phrase.substr(0, offset.length), alphabet);
+      meta["ceiling"] = vigenere_decipher(ceiling, phrase.substr(offset.length, ceiling.length), alphabet);
+      var subphrase = phrase.substr(meta["offset"].length + meta["ceiling"].length);
+      var label_offset = mod(Number(meta["ceiling"]), subphrase.length);
+      var prefix = alphabet[0].repeat(label_offset);
+      label = vigenere_decipher(prefix + label, subphrase, alphabet);
+      meta["label"] = label.substr(label_offset);
+    }
+  }
+}
+
+function meta_to_str(meta) {
+  return "^" + meta["label"] + meta["offset"] + "-" + meta["ceiling"] + "^";
+}
+
+function get_crypto_meta(s, phrase) {
+  var m = s.match(/^\^(...)((.+)-(.+))?\^/);
   if (m) {
     return { "label": m[1], "offset": m[3], "ceiling": m[4] };
   }
@@ -272,7 +304,7 @@ function get_crypto_meta(s) {
 }
 
 function remove_crypto_meta(s) {
-  return s.replace(/^@.*@/, "");
+  return s.replace(/^\^.*\^/, "");
 }
 
 function encrypt() {
@@ -284,14 +316,14 @@ function encrypt() {
   var last_code = document.getElementById("last-code").value;
   var alphabet = document.getElementById("alphabet").value;
 
-  // Prepare message, phrase and otp
+  // Prepare inputs
   message = crypto_str(message);
   phrase = crypto_str(phrase);
   var otp_meta = get_crypto_meta(otp);
-  var last_cipher_meta = get_crypto_meta(last_code) || { "label": true, "offset": true, "ceiling": last_code.match(/^[0-9]+$/) };
+  var last_cipher_meta = get_crypto_meta(last_code);
+  decipher_meta(last_cipher_meta, phrase, alphabet);
+  var last_cipher_meta = last_cipher_meta || { "label": true, "offset": true, "ceiling": last_code.match(/^[0-9]+$/) };
   otp = remove_crypto_meta(otp);
-  // TODO last msg match with otp meta validate
-  // TODO make sure otp has label
 
   // Input validation
   clean_errors();
@@ -303,6 +335,7 @@ function encrypt() {
   }
 
   // Output fields
+  var head = document.getElementById("head");
   var output = document.getElementById("output");
   var ig_writable = document.getElementById("ig-writable");
 
@@ -310,8 +343,10 @@ function encrypt() {
   var otp_offset = Number(last_cipher_meta["ceiling"]);
   var vigenere_cipher = vigenere_encipher(message, phrase, alphabet);
   var otp_cipher = otp_encipher(vigenere_cipher, otp, alphabet, otp_offset);
-  var cipher_meta = "@" + otp_meta["label"] + otp_offset + "-" + (otp_offset + otp_cipher.length) + "@";
-  otp_cipher = cipher_meta + otp_cipher;
+  var cipher_meta = { "label": otp_meta["label"], "offset": String(otp_offset), "ceiling": String(otp_offset + otp_cipher.length) };
+  encipher_meta(cipher_meta, phrase, alphabet);
+  otp_cipher = meta_to_str(cipher_meta) + otp_cipher;
+  head.value = meta_to_str(last_cipher_meta);
   output.value = otp_cipher;
   ig_writable.value = to_ig_writable(crypto_description() + otp_cipher, "Cryptic Writings");
 }
@@ -327,6 +362,7 @@ function decrypt() {
   // Prepare inputs
   phrase = crypto_str(phrase);
   var cipher_meta = get_crypto_meta(cipher);
+  decipher_meta(cipher_meta, phrase, alphabet);
   var otp_meta = get_crypto_meta(otp);
   otp = remove_crypto_meta(otp);
   cipher = remove_crypto_meta(cipher);
@@ -341,12 +377,14 @@ function decrypt() {
   }
 
   // Output fields
+  var head = document.getElementById("head");
   var output = document.getElementById("output");
   var ig_writable = document.getElementById("ig-writable");
 
   var otp_offset = Number(cipher_meta["offset"]);
   var vigenere_cipher = otp_decipher(cipher, otp, alphabet, otp_offset);
   var message = vigenere_decipher(vigenere_cipher, phrase, alphabet);
+  head.value = meta_to_str(cipher_meta);
   output.value = real_str(message);
   ig_writable.value = to_ig_writable(output.value, "Writings");
 }

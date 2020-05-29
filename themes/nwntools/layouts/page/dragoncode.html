@@ -11,7 +11,7 @@
               <p>This secret code system has slowly started circulating in the Lands of Mists among groups that see its value for keeping themselves and theirs safe, covering nefarious activities or sharing secrets that threaten those in power. If used correctly, its promise is to make it impossible to decipher one's communications without infiltrating or influencing the people involved.</p>
               <p>While the code is easy to teach to those of average intelligence, it can be boring OOCly to do by hand. Let this tool do all the heavy lifting instead.</p>
               <h4>Encrypting</h4>
-              <p>Put the message, key phrase and one time key into the appropriate fields. If it's not the first message used for this one time key, also input the last coded message, its "@...@" label or simply where it should start being coded in the one time key. Then click "Encrypt".</p>
+              <p>Put the message, key phrase and one time key into the appropriate fields. If it's not the first message used for this one time key, also input the last coded message, its "^...^" label or simply where it should start being coded in the one time key. Then click "Encrypt".</p>
               <h4>Decrypting</h4>
               <p>Put the coded message, key phrase and one time key into the appropriate fields. Then click "Decrypt".</p>
             </div>
@@ -34,7 +34,7 @@
                 </span>
               </label>
               <div class="control">
-                <input id="alphabet" class="input rl-input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-?'_$"></input>
+                <input id="alphabet" class="input rl-input" type="text" placeholder="Alphabet" value="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.-?!'&quot;:()_$"></input>
               </div>
             </div>
           </div>
@@ -47,7 +47,7 @@
               <p>A fairly hard to guess Key Phrase is chosen and memorized by everyone, for example: "Teddlar fingoth cakemaker". Then a new One Time Key is made. This key consists of a sequence of randomly picked symbols from the alphabet. Each symbol can be picked by throwing dice. For example, if the alphabet numbers are 0 - 60, then 8d6 can be thrown and the result subtracted by 8. If the result is over 60, then we throw again, otherwise we write the symbol corresponding to the number.</p>
               <p>For the first Message we want to code, the Key Phrase is lined up with the start of the Message. The number representation of each adjacent symbol is added together, and the symbol representation of the resulting number becomes a part of the Key Phrase Coded Message. If the number result goes beyond the alphabet, we count the rest from the start of the alphabet as if the alphabet were arranged in a circle. The Key Phrase is used again and again until all the Message symbols are coded. Next we line the whole One Time Key up with the Key Phrase Coded Message and get the final Coded Message in the same way, except the One Time Key is used only once. It must therefore be as long or longer than the message. To decipher the Coded Message to get the Message, the process is simply reversed.</p>
               <p>The same portion of the One Time Key must not be used for more than one Message, because anyone with their hands on two Coded Messages made with the same One Time Key has a tiny chance to figure out the One Time Key. For this reason, all subsequent Messages made with a distinct One Time Key must use the portion of the One Time Key starting from the end of its used portion, i.e. where the last Message ended. At some point, the One Time Key will be just about used up, so the group must come together again to share a new One Time Key. The arrangement of that meeting can be announced with the little that is left of the One Time Key.</p>
-              <p>To more easily track which portion of which One Time Key should be used, each One Time Key is given a three letter, random looking label at the start of it, e.g. "@ArQ@". Each Message is also labelled e.g. "@ArQ24-60", where 24 is where the Message start in the One Time Key "ArQ" and where 60 is where the next Message should start.</p>
+              <p>To more easily track which portion of which One Time Key should be used, each One Time Key is given a three letter, random looking label at the start of it, e.g. "^ArQ^". Each Message is also labelled e.g. "^ArQ24-60^", where 24 is where the Message start in the One Time Key "ArQ" and where 60 is where the next Message should start.</p>
             </div>
           </div>
         </div>
@@ -90,7 +90,7 @@
             <div class="field">
               <label class="label rl-text-color">
                 <span>Last Coded Message</span>
-                <span class="has-tooltip-multiline" data-tooltip="Only needed for encrypting. You can input the whole of the last coded message, its @...@ preamble or simply the number index of where in the OTK it should start encrypting.">
+                <span class="has-tooltip-multiline" data-tooltip="Only needed for encrypting. You can input the whole of the last coded message, its ^...^ preamble or simply the number index of where in the OTK it should start encrypting.">
                   <i class="fas fa-question-circle"></i>
                 </span>
               </label>
@@ -103,6 +103,17 @@
         <div class="column">
           <div class="box rl-background">
             <div class="field">
+              <label class="label rl-text-color">
+                <span>Head</span>
+                <span class="has-tooltip-multiline" data-tooltip="When encrypting, this is the decrypted head of the Last Coded Message. When decrypting, it's the decrypted head of the Coded Message">
+                  <i class="fas fa-question-circle"></i>
+                </span>
+              </label>
+              <div class="control">
+                <input id="head" class="input rl-input" readonly></input>
+              </div>
+            </div>
+            <div class="field">
               <label class="label rl-text-color">Result</label>
               <div class="control">
                 <textarea id="output" class="textarea rl-input" placeholder="Output" readonly></textarea>
@@ -111,7 +122,7 @@
             <div class="field">
               <label class="label rl-text-color">Commands for writing in game</label>
               <div class="control">
-                <textarea id="ig-writable" class="textarea rl-input" placeholder="Output" rows="12" readonly></textarea>
+                <textarea id="ig-writable" class="textarea rl-input" placeholder="Output" rows="10" readonly></textarea>
               </div>
             </div>
             <div class="field is-grouped">
