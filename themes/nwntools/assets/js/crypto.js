@@ -346,7 +346,12 @@ function encrypt() {
   var cipher_meta = { "label": otp_meta["label"], "offset": String(otp_offset), "ceiling": String(otp_offset + otp_cipher.length) };
   encipher_meta(cipher_meta, phrase, alphabet);
   otp_cipher = meta_to_str(cipher_meta) + otp_cipher;
-  head.value = meta_to_str(last_cipher_meta);
+  if (typeof last_cipher_meta["label"] === 'string') {
+    head.value = meta_to_str(last_cipher_meta);
+  }
+  else {
+    head.value = "";
+  }
   output.value = otp_cipher;
   ig_writable.value = to_ig_writable(crypto_description() + otp_cipher, "Cryptic Writings");
 }
