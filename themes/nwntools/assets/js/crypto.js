@@ -393,3 +393,11 @@ function decrypt() {
   output.value = real_str(message);
   ig_writable.value = to_ig_writable(output.value, "Writings");
 }
+
+function make_instructions() {
+  var instructions = document.getElementById("instructions");
+  var alphabet = document.getElementById("alphabet").value;
+  var runes = document.getElementById("runes").value;
+  var s = "[This parchment starts with a three tiered code wheel with one tier lined with " + runes + " runes, one with numbers from 0, 1, 2 and up and one with the symbols " + alphabet + ". What follows are extensive instructions on how to code and decode secret messages in 'dragon' code]|||//OOC:|https://nwntools.github.io/potm/dragoncode/"
+  instructions.value = to_ig_writable(s, "Code Instructions");
+}
