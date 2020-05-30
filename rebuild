@@ -1,0 +1,10 @@
+#!/bin/bash
+mv public/.git g
+rm -r public
+hugo
+mv g public/.git
+cd public
+git add .
+git commit -m "."
+git push origin master
+cd ..
